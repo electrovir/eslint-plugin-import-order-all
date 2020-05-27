@@ -1,7 +1,7 @@
 {
-  "name": "eslint-plugin-import",
+  "name": "eslint-plugin-import-order-all",
   "version": "2.20.2",
-  "description": "Import with sanity.",
+  "description": "Import with sanity and order all imports",
   "engines": {
     "node": ">=4"
   },
@@ -35,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/benmosher/eslint-plugin-import"
+    "url": "https://github.com/electrovir/eslint-plugin-import-order-all"
   },
   "keywords": [
     "eslint",
@@ -46,12 +46,15 @@
     "import",
     "export"
   ],
-  "author": "Ben Mosher <me@benmosher.com>",
+  "contributors": [
+    "Ben Mosher <me@benmosher.com>",
+    "electrovir (https://github.com/electrovir)"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/benmosher/eslint-plugin-import/issues"
+    "url": "https://github.com/electrovir/eslint-plugin-import-order-all/issues"
   },
-  "homepage": "https://github.com/benmosher/eslint-plugin-import",
+  "homepage": "https://github.com/electrovir/eslint-plugin-import-order-all",
   "devDependencies": {
     "@eslint/import-test-order-redirect-scoped": "file:./tests/files/order-redirect-scoped",
     "@test-scope/some-module": "file:./tests/files/symlinked-module",

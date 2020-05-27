@@ -133,49 +133,6 @@ function findStartOfLineWithComments(sourceCode, node) {
   return result
 }
 
-function isPlainRequireModule(node) {
-  if (node.type !== 'VariableDeclaration') {
-    return false
-  }
-  if (node.declarations.length !== 1) {
-    return false
-  }
-  const decl = node.declarations[0]
-  const result = decl.id &&
-    (decl.id.type === 'Identifier' || decl.id.type === 'ObjectPattern') &&
-    decl.init != null &&
-    decl.init.type === 'CallExpression' &&
-    decl.init.callee != null &&
-    decl.init.callee.name === 'require' &&
-    decl.init.arguments != null &&
-    decl.init.arguments.length === 1 &&
-    decl.init.arguments[0].type === 'Literal'
-  return result
-}
-
-function isPlainImportModule(node) {
-  return node.type === 'ImportDeclaration' && node.specifiers != null && node.specifiers.length > 0
-}
-
-function canCrossNodeWhileReorder(node) {
-  return isPlainRequireModule(node) || isPlainImportModule(node)
-}
-
-function canReorderItems(firstNode, secondNode) {
-  const parent = firstNode.parent
-  const [firstIndex, secondIndex] = [
-    parent.body.indexOf(firstNode),
-    parent.body.indexOf(secondNode),
-  ].sort()
-  const nodesBetween = parent.body.slice(firstIndex, secondIndex + 1)
-  for (var nodeBetween of nodesBetween) {
-    if (!canCrossNodeWhileReorder(nodeBetween)) {
-      return false
-    }
-  }
-  return true
-}
-
 function fixOutOfOrder(context, firstNode, secondNode, order) {
   const sourceCode = context.getSourceCode()
 
@@ -186,7 +143,6 @@ function fixOutOfOrder(context, firstNode, secondNode, order) {
   const secondRoot = findRootNode(secondNode.node)
   const secondRootStart = findStartOfLineWithComments(sourceCode, secondRoot)
   const secondRootEnd = findEndOfLineWithComments(sourceCode, secondRoot)
-  const canFix = canReorderItems(firstRoot, secondRoot)
 
   let newCode = sourceCode.text.substring(secondRootStart, secondRootEnd)
   if (newCode[newCode.length - 1] !== '\n') {
@@ -200,7 +156,7 @@ function fixOutOfOrder(context, firstNode, secondNode, order) {
     context.report({
       node: secondNode.node,
       message: message,
-      fix: canFix && (fixer =>
+      fix: (fixer =>
         fixer.replaceTextRange(
           [firstRootStart, secondRootEnd],
           newCode + sourceCode.text.substring(firstRootStart, secondRootStart)
@@ -210,7 +166,7 @@ function fixOutOfOrder(context, firstNode, secondNode, order) {
     context.report({
       node: secondNode.node,
       message: message,
-      fix: canFix && (fixer =>
+      fix: (fixer =>
         fixer.replaceTextRange(
           [secondRootStart, firstRootEnd],
           sourceCode.text.substring(secondRootEnd, firstRootEnd) + newCode
@@ -596,7 +552,6 @@ module.exports = {
 
     return {
       ImportDeclaration: function handleImports(node) {
-        if (node.specifiers.length) { // Ignoring unassigned imports
           const name = node.source.value
           registerNode(
             context,
@@ -607,7 +562,6 @@ module.exports = {
             imported,
             pathGroupsExcludedImportTypes
           )
-        }
       },
       CallExpression: function handleRequires(node) {
         if (level !== 0 || !isStaticRequire(node) || !isInVariableDeclarator(node.parent)) {
