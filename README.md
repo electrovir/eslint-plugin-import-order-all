@@ -26,4 +26,4 @@ import 'module';
 
 (The relative ordering between `internal/module` and `module` may differ depending on your `order` rule settings.)
 
-Rules are still defined with the original package name of `eslint-plugin-import`. However, the plugin to be loaded must be `eslint-plugin-import-order-all`.
+To use this you must add the `import-order-all` plugin to your eslintrc instead of `import`. Also, all rules must use the `import-order-all/` path instead of `import/`.
